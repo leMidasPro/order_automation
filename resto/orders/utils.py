@@ -27,6 +27,7 @@ def generate_invoice_data(order):
         "location": order.location,
         "status": order.status,
     }
+    
 
 
 def generate_invoice(order):

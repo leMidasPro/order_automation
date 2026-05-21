@@ -1,0 +1,13 @@
+__pycache__/
+*/__pycache__/
+*.pyc
+media/
+logs/
+venv/
+.env
+.DS_Store
+dump.rdb
+django_debug.log
+celerybeat-scheldule.db
+db.sqlite3
+*.xml
