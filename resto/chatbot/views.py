@@ -1,5 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.urls import reverse
 import json
 
 from .models import ChatSession
@@ -114,11 +115,18 @@ def whatsapp_webhook(request):
                 location=session.location
             )
 
-            pdf_path = generate_invoice_pdf(order)
+            generate_invoice_pdf(order)
             invoice_text = generate_invoice(order)
 
-            order.invoice_pdf = pdf_path
-            order.save()
+            invoice_url = request.build_absolute_uri(
+                reverse('orders:invoice', args=[order.id])
+            )
+            download_url = request.build_absolute_uri(
+                reverse('orders:download_invoice', args=[order.id])
+            )
+
+            order_quantity = order.quantity
+            order_total = order.total_price
 
             # reset session
             session.step = "accueil"
@@ -134,12 +142,18 @@ def whatsapp_webhook(request):
 
                 📄 Votre facture est prête.
 
+                Voir : {invoice_url}
+                Télécharger : {download_url}
+
                 Plat : {product.name}
-                Quantité : {session.quantity}
-                Total : {total} FCFA
+                Quantité : {order_quantity}
+                Total : {order_total} FCFA
 
                 Merci pour votre confiance 🙏
-                """
+                """,
+                "order_id": order.id,
+                "invoice_url": invoice_url,
+                "download_url": download_url,
             })
 
         # 🔹 FALLBACK
@@ -148,5 +162,3 @@ def whatsapp_webhook(request):
         })
 
     return JsonResponse({'error': 'Invalid method'})
-
-
