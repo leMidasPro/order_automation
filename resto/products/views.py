@@ -23,6 +23,8 @@ def list_products(request):
 
 
 
+
+
 @csrf_exempt
 def create_product(request):
     if request.method == 'POST':
